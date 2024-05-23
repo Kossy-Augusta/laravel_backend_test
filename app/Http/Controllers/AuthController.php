@@ -36,7 +36,7 @@ class AuthController extends Controller
             ], 401);
         }
         // generate token for the user and add 1 minute as expiration
-        $token = $user->createToken('myApiToken', ['*'], now()->addMinute())->plainTextToken;
+        $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
 
         $response = [
             'user' => $user,
@@ -44,5 +44,16 @@ class AuthController extends Controller
         ];
 
         return response($response, 201);
+    }
+
+// Log out curreently authenticated user
+
+    public function logout(Request $request){
+        auth()->user()->tokens()->delete();
+
+
+        return response([
+            'message' => 'Logged out'
+        ]);
     }
 }
