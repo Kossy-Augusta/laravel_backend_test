@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Products;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -38,9 +39,12 @@ class AuthController extends Controller
         // generate token for the user and add 1 minute as expiration
         $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
 
+        $products = Products::where('user_id', $user->id)->latest()->get();
+
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'products' => $products
         ];
 
         return response($response, 201);
