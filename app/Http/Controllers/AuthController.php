@@ -40,11 +40,12 @@ class AuthController extends Controller
         $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
 
         $products = Products::where('user_id', $user->id)->latest()->get();
+        
 
         $response = [
             'user' => $user,
             'token' => $token,
-            'products' => $products
+            'products' => $products->isEmpty() ? 'No products for this user' : $products
         ];
 
         return response($response, 201);
