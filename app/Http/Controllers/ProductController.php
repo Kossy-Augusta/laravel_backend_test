@@ -59,4 +59,15 @@ class ProductController extends Controller
         return response()->json([$product, 'message'=>'Product updated succesfully']);
 
     }
+    //  Delete a product
+    public function destroy($id, Request $request){
+        $product = Products::findorFail($id);
+        // Check if user is authenticated and product belongs to user
+        if($product->user_id !== auth()->id()){
+            return response()->json(['error_message'=>'Unauthorized access'], 403);
+        }
+        $product->delete($product);
+        return response()->json(['message'=>'Product was deleted succesfully']);
+
+    }
 }
