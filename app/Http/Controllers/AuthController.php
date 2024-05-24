@@ -30,9 +30,9 @@ class AuthController extends Controller
         ]);
         $user = User::where('email', $formFields['email'])->first();
         // Check if password matches the stored password or email exists
-        if (!$user || !Hash::check($formFields['password'], $user->password)){
+         if(!$user || !Hash::check($formFields['password'], $user->password)){
             return response([
-                'message' => 'Invalid Credentials'
+                'message' => 'Invalid credentials'
             ], 401);
         }
         // generate token for the user and add 1 minute as expiration
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
 // Log out curreently authenticated user
 
-    public function logout(Request $request){
+     public function logout(Request $request){
         auth()->user()->tokens()->delete();
 
 
