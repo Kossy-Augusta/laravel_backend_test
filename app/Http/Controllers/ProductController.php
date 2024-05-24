@@ -32,4 +32,10 @@ class ProductController extends Controller
         return response()->json($product, 201);
 
     }
+
+    // Show a detais of a particular product
+    public function show($id){
+        $product = Products::findorFail($id);
+        return response()->json($product, 201);
+    }
 }
