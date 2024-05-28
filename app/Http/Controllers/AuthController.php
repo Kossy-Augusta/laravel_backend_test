@@ -29,26 +29,37 @@ class AuthController extends Controller
             'email' => 'required|string',
             'password'=> 'required|string'
         ]);
-        $user = User::where('email', $formFields['email'])->first();
+        // $user = User::where('email', $formFields['email'])->first();
         // Check if password matches the stored password or email exists
-         if(!$user || !Hash::check($formFields['password'], $user->password)){
-            return response([
-                'message' => 'Invalid credentials'
-            ], 401);
+        //  if(!$user || !Hash::check($formFields['password'], $user->password)){
+        //     return response([
+        //         'message' => 'Invalid credentials'
+        //     ], 401);
+        // }
+        $credentials = $request->only('email', 'password');
+
+        // Try to autheneticate user
+        if(auth()->attempt($credentials)){
+            // Authentication passed
+            $user = auth()->user();
+            // generate token for the user and add one week as expiration
+            $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
+    
+            $products = Products::where('user_id', $user->id)->latest()->get();
+            
+    
+            $response = [
+                'user' => $user,
+                'token' => $token,
+                // 'products' => $products->isEmpty() ? 'No products for this user' : $products
+            ];
+    
+            return response($response, 201);
         }
-        // generate token for the user and add 1 minute as expiration
-        $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
 
-        $products = Products::where('user_id', $user->id)->latest()->get();
-        
-
-        $response = [
-            'user' => $user,
-            'token' => $token,
-            'products' => $products->isEmpty() ? 'No products for this user' : $products
-        ];
-
-        return response($response, 201);
+        return response()->json([
+            'message' => 'Invalid credentials'
+        ], 401);
     }
 
 // Log out curreently authenticated user
