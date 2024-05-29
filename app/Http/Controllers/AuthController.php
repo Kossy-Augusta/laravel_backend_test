@@ -2,45 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Products;
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     //Register a new user
-    public function register(Request $request){
-        $formFields = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
-            'password'=> 'required|confirmed'
-        ]);
-        $formFields['password'] = bcrypt($formFields['password']);
+    public function register(RegisterRequest $request) : Response
+    {
+        $validatedData =$request->validated(); 
+        $validatedData['password'] = Hash::make($validatedData['password']);
 
-        $user = User::create($formFields);
+        $user = User::create($validatedData);
         $response = ['user' => $user];
 
         return response($response, 201);
     }
     //Login a registered user
-    public function login(Request $request){
-        $formFields = $request->validate([
-            'email' => 'required|string',
-            'password'=> 'required|string'
-        ]);
-        // $user = User::where('email', $formFields['email'])->first();
-        // Check if password matches the stored password or email exists
-        //  if(!$user || !Hash::check($formFields['password'], $user->password)){
-        //     return response([
-        //         'message' => 'Invalid credentials'
-        //     ], 401);
-        // }
+    public function login(LoginRequest $request){
+        $validatedData= $request->validated();
         $credentials = $request->only('email', 'password');
 
         // Try to autheneticate user
         if(auth()->attempt($credentials)){
-            // Authentication passed
+            // get instance of authenticated user
             $user = auth()->user();
             // generate token for the user and add one week as expiration
             $token = $user->createToken('myApiToken', ['*'], now()->addWeek())->plainTextToken;
