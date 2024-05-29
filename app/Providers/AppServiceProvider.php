@@ -27,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('update-product', function(User $user, Products $products){
             return $user->id===$products->user_id;
         });
+        // delete a product
+        Gate::define('destroy-product', function(User $user, Products $products){
+            return $user->id===$products->user_id;
+        });
     }
 }
