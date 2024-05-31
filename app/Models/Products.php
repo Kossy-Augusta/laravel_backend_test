@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ 
 class Products extends Model
 {
     use HasFactory;
@@ -29,5 +31,13 @@ class Products extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    /**
+     * Product can belong to different categories
+     */
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'category_product','prodcuts_id','category_id');
     }
 }
