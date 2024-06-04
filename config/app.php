@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Laravel\ServiceProvider;
+
 return [
 
     /*
