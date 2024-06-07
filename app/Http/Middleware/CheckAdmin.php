@@ -17,11 +17,14 @@ class CheckAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->hasRole('admin')){
-            return response()->json([
-                'message' => 'You do not have admin authorization'
-            ], 401);
+        if (!Auth::check()) {
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
+
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['message' => 'You do not have admin authorization'], 403);
+        }
+
         return $next($request);
     }
 }
