@@ -33,6 +33,10 @@ class ProductController extends Controller
                         ]);
 
         $product = auth()->user()->products()->create($requestData);
+        /**
+         * Check if incomming request contains category name 
+         * and then associate the product with the category
+         */
         if ($request->has('category_id'))
         {
              $categoryName = $request->category_name; 
