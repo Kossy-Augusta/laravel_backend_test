@@ -30,7 +30,8 @@ class UpdateRequest extends FormRequest
             'description' => 'sometimes|required|string',
             'quantity' => 'sometimes|required|integer',
             'unit_price' => 'sometimes|required|decimal:2',
-            'amount_sold' => 'sometimes|required|integer'
+            'amount_sold' => 'sometimes|required|integer',
+            'category_name' => 'sometimes|required|string|exists:categories,name'
         ];
     }
 }
