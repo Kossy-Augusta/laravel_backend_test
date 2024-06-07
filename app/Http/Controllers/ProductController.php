@@ -37,11 +37,20 @@ class ProductController extends Controller
          * Check if incomming request contains category name 
          * and then associate the product with the category
          */
-        if ($request->has('category_id'))
+        if ($request->has('category_name')) 
         {
-             $categoryName = $request->category_name; 
-            $product->categories()->sync([$categoryName]);   
+            $categoryName = $request->category_name; 
+            $category = Category::where('name', $categoryName)->firstOrFail();
+            if ($category) 
+            {
+                $product->categories()->sync([$category->id]);
+            }
+            else
+            {
+                return response()->json(['error' => 'Category does not exist'], 422);
+            }
         }
+
         return response()->json($product, 201);
 
     }
@@ -57,6 +66,11 @@ class ProductController extends Controller
         $validatedData = $request->validated() ;
 
         $product = Products::findorFail($id);
+        if ($request->has('category_id'))
+        {
+             $categoryName = $request->category_name; 
+            $product->categories()->sync([$categoryName]);   
+        }
         $product->update($validatedData);
         return response()->json([$product, 'message'=>'Product updated succesfully']);
 
