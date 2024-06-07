@@ -6,6 +6,7 @@ use App\Models\Products;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateRequest;
 use App\Http\Requests\UpdateRequest;
+use App\Models\Category;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -23,9 +24,20 @@ class ProductController extends Controller
     }
     //create a new product
     public function store(CreateRequest $request){
-        $validatedData = $request->validated();
+        $requestData = $request->only([
+                        'name',
+                        'description',
+                        'quantity',
+                        'unit_price',
+                        'amount_sold',
+                        ]);
 
-        $product = auth()->user()->products()->create($validatedData);
+        $product = auth()->user()->products()->create($requestData);
+        if ($request->has('category_id'))
+        {
+             $categoryName = $request->category_name; 
+            $product->categories()->sync([$categoryName]);   
+        }
         return response()->json($product, 201);
 
     }
