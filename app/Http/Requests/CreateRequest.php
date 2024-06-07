@@ -26,7 +26,8 @@ class CreateRequest extends FormRequest
             'description' => 'required|string',
             'quantity' => 'required|integer',
             'unit_price' => 'required|decimal:2',
-            'amount_sold' => 'required|integer'
+            'amount_sold' => 'required|integer',
+            'category_name' => 'required|exists:categories,name'
         ];
     }
 }
