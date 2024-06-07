@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CreateRequest;
 use App\Http\Requests\UpdateRequest;
 use App\Models\Category;
+use Hamcrest\Arrays\IsArray;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -39,16 +40,24 @@ class ProductController extends Controller
          */
         if ($request->has('category_name')) 
         {
-            $categoryName = $request->category_name; 
-            $category = Category::where('name', $categoryName)->firstOrFail();
-            if ($category) 
+            $categoryNames = $request->category_name; 
+            // make sure the categoryNames is an array
+            if (!is_array($categoryNames))
             {
-                $product->categories()->sync([$category->id]);
+                $categoryNames = [$categoryNames];
             }
-            else
+            //  retrieve the category Ids based on the category name
+            $categories = Category::whereIn('name', $categoryNames)->pluck('id')->toArray();
+            /**
+             * Check if one or more categories returned by the request
+             * do not exist in the category id returned from the DB
+             */
+            if (count($categoryNames) !== count($categories))
             {
-                return response()->json(['error' => 'Category does not exist'], 422);
+                return response()->json(['error' => 'One or more categories do not exist'], 422);
             }
+        
+            $product->categories()->sync($categories);
         }
 
         return response()->json($product, 201);
@@ -66,10 +75,30 @@ class ProductController extends Controller
         $validatedData = $request->validated() ;
 
         $product = Products::findorFail($id);
-        if ($request->has('category_id'))
+        /**
+         * Check if incomming request contains category name 
+         * and then associate the product with the category
+         */
+        if ($request->has('category_name')) 
         {
-             $categoryName = $request->category_name; 
-            $product->categories()->sync([$categoryName]);   
+            $categoryNames = $request->category_name; 
+            // make sure the categoryNames is an array
+            if (!is_array($categoryNames))
+            {
+                $categoryNames = [$categoryNames];
+            }
+            //  retrieve the category Ids based on the category name
+            $categories = Category::whereIn('name', $categoryNames)->pluck('id')->toArray();
+            /**
+             * Check if one or more categories returned by the request
+             * do not exist in the category id returned from the DB
+             */
+            if (count($categoryNames) !== count($categories))
+            {
+                return response()->json(['error' => 'One or more categories do not exist'], 422);
+            }
+        
+            $product->categories()->sync($categories);
         }
         $product->update($validatedData);
         return response()->json([$product, 'message'=>'Product updated succesfully']);
