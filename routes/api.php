@@ -25,4 +25,6 @@ Route::group(['middleware' => ['auth:sanctum']],function () {
 
 Route::middleware(['auth:sanctum', CheckAdmin::class])->group(function(){
     Route::post('/category', [CategoryController::class, 'store']);
+    Route::put('/category/{id}/update', [CategoryController::class, 'update']);
+    Route::delete('/category/{id}/destroy', [CategoryController::class, 'destroy']);
 });
