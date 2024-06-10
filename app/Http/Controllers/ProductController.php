@@ -70,6 +70,13 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
+    // search for a product
+    public function search($name)
+    {
+        $product = Products::where('name', 'like', '%'. $name.'%')->orderBy('name')->get();
+        return response()->json($product);
+    }
+
     //  Update a product
     public function update($id, UpdateRequest $request){
         $validatedData = $request->validated() ;
