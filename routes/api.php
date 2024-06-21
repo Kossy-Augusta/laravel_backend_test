@@ -1,13 +1,14 @@
 <?php
 
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Middleware\CheckAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\RolesAndPermissionController;
-use App\Http\Middleware\CheckAdmin;
-use App\Models\Category;
 
 // public Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -16,6 +17,8 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/category', [CategoryController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/products/search/{name}', [ProductController::class, 'search']);
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetEmailLink'])->name('password.email');
+Route::post('/password-reset', [ResetPasswordController::class,'reset'])->name('password.reset');
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']],function () {
     Route::post('/logout', [AuthController::class, 'logout']);
