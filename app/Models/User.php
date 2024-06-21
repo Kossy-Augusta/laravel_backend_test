@@ -6,6 +6,7 @@ namespace App\Models;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,5 +62,9 @@ class User extends Authenticatable
     public function hasRole($role)
     {
         return $this->roles()->where('name', $role)->exists();
+    }
+     public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
