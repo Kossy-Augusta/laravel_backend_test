@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Products;
+use Hamcrest\Arrays\IsArray;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Requests\CreateRequest;
 use App\Http\Requests\UpdateRequest;
-use App\Models\Category;
-use Hamcrest\Arrays\IsArray;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -21,7 +22,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'No products listed']);
         }
 
-        return response()->json($products);
+        return response()->json(['data'=>$products, Response::HTTP_ACCEPTED]);
     }
     //create a new product
     public function store(CreateRequest $request){
@@ -60,21 +61,21 @@ class ProductController extends Controller
             $product->categories()->sync($categories);
         }
 
-        return response()->json($product, 201);
+        return response()->json([$product, Response::HTTP_CREATED]);
 
     }
 
     // Show a detais of a particular product
     public function show($id){
         $product = Products::findorFail($id);
-        return response()->json($product, 201);
+        return response()->json(['data'=>$product, Response::HTTP_CREATED]);
     }
 
     // search for a product
     public function search($name)
     {
         $product = Products::where('name', 'like', '%'. $name.'%')->orderBy('name')->get();
-        return response()->json($product);
+        return response()->json(['data'=>$product]);
     }
 
     //  Update a product
@@ -108,7 +109,7 @@ class ProductController extends Controller
             $product->categories()->sync($categories);
         }
         $product->update($validatedData);
-        return response()->json([$product, 'message'=>'Product updated succesfully']);
+        return response()->json(['data'=>$product, 'message'=>'Product updated succesfully']);
 
     }
     //  Delete a product
